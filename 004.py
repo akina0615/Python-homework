@@ -9,7 +9,7 @@ from matplotlib.figure import Figure
 
 class MatchDna():
     def __init__(self, dna):
-        self.__dna = dna.upper()[:-1]
+        self.__dna = dna.upper().strip()
         self.__r_dna = self.__dna[::-1]
         self.__match__()
 
@@ -22,6 +22,10 @@ class MatchDna():
         self.__r_dna = self.__r_dna.replace('temp2', 'A')
         self.__r_dna = self.__r_dna.replace('temp3', 'C')
         self.__r_dna = self.__r_dna.replace('temp4', 'G')
+        for t in self.__r_dna:
+            if t != 'A' and t != 'T' and t != 'G' and t != 'C':
+                messagebox.showwarning(title="警告", message='DNA序列中存在非法字符,请检查!')
+                break
 
     def get_r(self):
         return self.__r_dna
