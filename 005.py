@@ -15,11 +15,14 @@ class CGContent:
     def __cal_content__(self, dna):
         count_c = 0
         count_g = 0
-        for c in dna:
+        for c in dna.strip():
             if c == 'C':
                 count_c += 1
             if c == 'G':
                 count_g += 1
+            if c != 'C' and c != "G" and c != 'A' and c != 'T':
+                messagebox.showwarning(title="警告", message='DNA序列中存在非法字符,请检查!')
+                pass
         content = ((count_c + count_g) / len(dna) * 100)
         # content = "{:.2f}".format(content)
         return content
