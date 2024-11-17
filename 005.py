@@ -157,4 +157,6 @@ class Draw:
         pass
 
 
-test = Frame()
+
+if __name__ == "__main__":
+    test = Frame()
