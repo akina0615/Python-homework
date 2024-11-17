@@ -143,7 +143,7 @@ class Draw:
         fig = Figure(figsize=(pic_size["x"], pic_size["y"]), dpi=100)
         ax = fig.add_subplot(111)
         bars = ax.bar(index, data, color=['blue', 'green', 'red', 'purple', 'gray'])
-        ax.set_ylim(0, max((data)) + 1)
+        ax.set_ylim(0, max(data) + 1)
         ax.set_xlabel(x_label)
         ax.set_ylabel(y_label)
         ax.set_title(title)
