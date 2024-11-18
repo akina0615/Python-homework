@@ -90,6 +90,7 @@ class CountDna:
         tkinter.Button(window, text=config["button2"], font=config["font"], width=5, height=1,
                        command=button2_click).place(x=700, y=55)
 
+        window.resizable(False, False)
         window.mainloop()
 
     def __display_chart__(self, master):

@@ -97,8 +97,8 @@ class Frame:
         tkinter.Button(window, text=config["button2"], font=config["font"], width=5, height=1,
                        command=button2_click).place(x=700, y=105)
 
+        window.resizable(False, False)
         window.mainloop()
-        pass
 
     def __select_file__(self):
         file_path = filedialog.askopenfilename(title="选择文件")

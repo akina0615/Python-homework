@@ -127,6 +127,7 @@ class Transcription:
         tkinter.Button(window, text=config["button4"], font=config["font"], width=5, height=1,
                        command=button4_click).place(x=700, y=205)
 
+        window.resizable(False, False)
         window.mainloop()
 
     def __display_chart__(self, master, list1):
