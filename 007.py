@@ -107,20 +107,23 @@ class Frame:
         var1 = tkinter.StringVar()
         entry = self.__create_entry__(master, width=width, var=var1)
         entry.place(x=x, y=y)
+        scroll = tkinter.Scrollbar(master, orient="vertical")
         listbox = tkinter.Listbox(master, width=width, height=height)
+        listbox.config(yscrollcommand=scroll.set)
+        for i in range(range_a, range_b):
+            listbox.insert("end", str(i))
+        scroll.config(command=listbox.yview)
 
         def entry_n_bind(event):
             listbox.place(x=x, y=y + 20)
-            listbox.delete(0, "end")
-            for i in range(range_a, range_b):
-                listbox.insert("end", str(i))
-                # scroll
+            scroll.place(x=x + 80, y=y + 30)
 
         def listbox_curselection(event):
             index = listbox.curselection()[0]
             listbox.activate(index)
             var1.set(listbox.get(index))
             listbox.place_forget()
+            scroll.place_forget()
 
         entry.bind("<Button-1>", entry_n_bind)
         listbox.bind("<ButtonRelease-1>", listbox_curselection)
