@@ -50,6 +50,8 @@ class Frame:
         window = tkinter.Tk()
         window.geometry(self.config["geometry"])
         window.title(self.config["title"])
+        window.resizable(False, False)
+
         label_author = self._create_label_(window, text=self.config["author"],
                                            width=40, height=3)
         label_author.pack(side="bottom")
@@ -96,7 +98,6 @@ class Frame:
         button_calculate = self._create_button_(window, width=5, height=1, button_click=button_calculate_f)
         button_calculate.place(x=740, y=100)
 
-        window.resizable(False, False)
         window.mainloop()
 
     @staticmethod
