@@ -28,6 +28,7 @@ class FindMotif:
 
 class Frame:
     def __init__(self):
+        self._pos = []
         self.config = {
             "geometry": "800x600+200+200",
             "size_x": 800,
@@ -81,29 +82,74 @@ class Frame:
         text_4.pack(side="top", fill="x", padx=0, pady=frame_1_offset[1])
 
         def button_click_1():
-            pass
+            dna = text_1.get('1.0', 'end').strip()
+            if not dna:
+                messagebox.showwarning(title='警告', message='DNA序列为空')
+                return
+
+            motif = text_3.get('1.0', 'end').strip()
+            if not motif:
+                messagebox.showwarning(title='警告', message='motif序列为空')
+                return
+
+            self._find_motif = FindMotif(dna, motif)
+            self._pos = self._find_motif.pos
+            if len(self._pos) > 0:
+                message = "出现的位点为:"
+                for item in self._pos:
+                    message += f"{item},"
+                messagebox.showinfo(title="查找结果", message=message[:-1])
+            else:
+                messagebox.showinfo(title="查找结果", message=f"没有找到{motif}.")
 
         def button_click_2():
+            path = self._select_file_()
+            if path != "none":
+                text_2.delete('1.0', 'end')
+                text_2.insert('end', path)
+                text = self._read_file_(path)
+                text_1.delete('1.0', 'end')
+                text_1.insert('end', text)
             pass
 
         def button_click_3():
-            pass
+            d = Draw(window)
+            if len(self._pos) > 0:
+                data = d.create_bool_data(self._pos, len(text_1.get('1.0', 'end').strip()),
+                                          len(text_3.get('1.0', 'end').strip()))
+                index = d.create_index(data)
+                d.draw_chart(data, index, pic_size={"x": 7, "y": 3}, title="查找结果", x_label="位点",
+                             y_label="是否符合", location={"x": 60.0, "y": 240.0})
+            else:
+                button_click_1()
+                data = d.create_bool_data(self._pos, len(text_1.get('1.0', 'end').strip()),
+                                          len(text_3.get('1.0', 'end').strip()))
+                index = d.create_index(data)
+                d.draw_chart(x_data=data, x_index=index)
 
         def button_click_4():
+
+            path = self._select_file_()
+            if path != "none":
+                text_4.delete('1.0', 'end')
+                text_4.insert('end', path)
+                text = self._read_file_(path)
+                text_3.delete('1.0', 'end')
+                text_3.insert('end', text)
             pass
 
         button_1 = self._create_button_(frame_3, text=self.config["button1"], width=6, height=1,
-                                        button_click=button_click_1())
-        button_1.pack(side="top", padx=0, pady=frame_1_offset[1]-6)
+                                        button_click=button_click_1)
+        button_1.pack(side="top", padx=0, pady=frame_1_offset[1] - 6)
         button_2 = self._create_button_(frame_3, text=self.config["button2"], width=6, height=1,
-                                        button_click=button_click_2())
-        button_2.pack(side="top", padx=0, pady=frame_1_offset[1]-6)
+                                        button_click=button_click_2)
+        button_2.pack(side="top", padx=0, pady=frame_1_offset[1] - 6)
         button_3 = self._create_button_(frame_3, text=self.config["button3"], width=6, height=1,
-                                        button_click=button_click_3())
-        button_3.pack(side="top", padx=0, pady=frame_1_offset[1]-6)
+                                        button_click=button_click_3)
+        button_3.pack(side="top", padx=0, pady=frame_1_offset[1] - 6)
         button_4 = self._create_button_(frame_3, text=self.config["button4"], width=6, height=1,
-                                        button_click=button_click_4())
-        button_4.pack(side="top", padx=0, pady=frame_1_offset[1]-6)
+                                        button_click=button_click_4)
+        button_4.pack(side="top", padx=0, pady=frame_1_offset[1] - 6)
 
         window.mainloop()
 
@@ -139,6 +185,65 @@ class Frame:
     def _create_button_(self, master, text, width, height, button_click):
         return tkinter.Button(master, text=text, font=self.config["font"],
                               width=width, height=height, command=button_click)
+
+    @staticmethod
+    def _select_file_():
+        file_path = filedialog.askopenfilename(title="选择文件")
+        if file_path:
+            return file_path
+        else:
+            messagebox.showwarning(title='错误', message='文件不存在!')
+            return "none"
+
+    @staticmethod
+    def _read_file_(path):
+        with open(path, 'r') as fh:
+            return fh.read()
+
+
+class Draw:
+    def __init__(self, master):
+        self.__master = master
+
+    def draw_chart(self, x_data, x_index, pic_size: dict[float:float] = {"x": 7, "y": 3}, title="查找结果", x_label="位点",
+                   y_label="是否符合",
+                   location: dict[str:float] = {"x": 60.0, "y": 250.0}):
+        plt.rcParams["font.sans-serif"] = ["SimHei"]
+        plt.rcParams["axes.unicode_minus"] = False
+        data = x_data
+        index = x_index
+        fig = Figure(figsize=(pic_size["x"], pic_size["y"]), dpi=100)
+        ax = fig.add_subplot(111)
+        bars = ax.bar(index, data, color=['red'])
+        ax.set_ylim(0, 1)
+        ax.set_xlabel(x_label)
+        ax.set_ylabel(y_label)
+        ax.set_title(title)
+        for bar, height in zip(bars, data):
+            y_val = height
+            ax.text(bar.get_x() + bar.get_width() / 2 - 0.1, y_val,
+                    y_val, ha='center', va='bottom')
+        canvas = FigureCanvasTkAgg(fig, master=self.__master)
+        canvas.draw()
+        canvas.get_tk_widget().place(x=location["x"], y=location["y"])
+        pass
+
+    @staticmethod
+    def create_index(data_list: list):
+        index = []
+        for i in range(len(data_list)):
+            index.append(i + 1)
+        return index
+
+    @staticmethod
+    def create_bool_data(data_list: list, n, m):
+        data = []
+        for i in range(n):
+            data.append(0)
+        for i in data_list:
+            for j in range(i, i + m):
+                data[j - 1] = 1
+        return data
 
 
 if __name__ == '__main__':
