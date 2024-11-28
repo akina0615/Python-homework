@@ -12,7 +12,8 @@ class CGContent:
         for t in self.__dna.keys():
             self.__dna[t] = self.__cal_content__(self.__dna[t])
 
-    def __cal_content__(self, dna):
+    @staticmethod
+    def __cal_content__(dna):
         count_c = 0
         count_g = 0
         for c in dna.strip():
@@ -22,6 +23,7 @@ class CGContent:
                 count_g += 1
             if c != 'C' and c != "G" and c != 'A' and c != 'T':
                 messagebox.showwarning(title="警告", message='DNA序列中存在非法字符,请检查!')
+                break
                 pass
         content = ((count_c + count_g) / len(dna) * 100)
         # content = "{:.2f}".format(content)

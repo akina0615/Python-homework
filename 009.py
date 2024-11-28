@@ -8,7 +8,17 @@ from matplotlib.figure import Figure
 class FindMotif:
     def __init__(self, dna: str, motif: str):
         self._dna = dna.upper().strip()
+        for c in self._dna:
+            if c != 'C' and c != "G" and c != 'A' and c != 'T':
+                messagebox.showwarning(title="警告", message='DNA序列中存在非法字符,请检查!')
+                break
+                pass
         self._motif = motif.upper().strip()
+        for c in self._motif:
+            if c != 'C' and c != "G" and c != 'A' and c != 'T':
+                messagebox.showwarning(title="警告", message='motif序列中存在非法字符,请检查!')
+                break
+                pass
         self._pos: list[int] = []
         self._find_motif_()
 
@@ -154,10 +164,10 @@ class Frame:
         window.mainloop()
 
     @staticmethod
-    def _create_frame_(master, width, height, propagate=0, box=False):
+    def _create_frame_(master, width, height, propagate=False, box=False):
         frame = tkinter.Frame(master, width=width, height=height)
         frame.pack_propagate(propagate)
-        if not box:
+        if box:
             frame.config(highlightbackground="black", highlightthickness=2)
         return frame
 
