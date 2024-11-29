@@ -39,6 +39,7 @@ class Frame:
     read_path = None
 
     def __init__(self):
+        self._dna_dict={}
         config = {
             "geometry": "800x600+200+200",
             "font": ("Arial", 12),
@@ -58,15 +59,25 @@ class Frame:
         tkinter.Label(window, text=config["label2"], font=config["font"], width=20, height=2).place(x=65, y=100)
         text1 = tkinter.Text(window, font=config["font"], width=50, height=1.5)
         text1.place(x=230, y=50)
-        text1.config(state=tkinter.DISABLED)
         text2 = tkinter.Text(window, font=config["font"], width=50, height=1.5)
         text2.place(x=230, y=100)
 
         def button1_click():
-            self.__read_file__()
-            self.str_data = text1.get("1.0", "end")
-            if self.dna_dict:
-                percent_dict = CGContent(self.dna_dict).get_dict()
+            if text2.get('1.0', 'end').strip():
+                self.__read_file__()
+                self.str_data = text1.get("1.0", "end")
+            else:
+                text2.get('1.0', 'end').strip()
+                sequences = text1.get('1.0', 'end').strip().split('>')
+                for seq in sequences:
+                    if seq:
+                        lines = seq.splitlines()
+                        header = lines[0]
+                        sequence = ''.join(lines[1:])
+                        self._dna_dict[header] = sequence
+                pass
+            if self._dna_dict:
+                percent_dict = CGContent(self._dna_dict).get_dict()
                 max_percent_name = ""
                 max_percent = 0
                 for t in percent_dict.keys():
@@ -75,7 +86,7 @@ class Frame:
                         max_percent = percent_dict[t]
                 # print(max_percent_name, max_percent)
                 d = Draw(window)
-                d.draw_chart(self.dna_dict.values(), self.dna_dict.keys(), {"x": 5, "y": 4}, "CG含量", "DNA名称",
+                d.draw_chart(self._dna_dict.values(), self._dna_dict.keys(), {"x": 5, "y": 4}, "CG含量", "DNA名称",
                              "CG含量", {"x": 160, "y": 150})
                 messagebox.showinfo(title="统计结果",
                                     message=f"CG含量最高的DNA序列名称为:{max_percent_name},含量为:{max_percent:.2f}%")
@@ -89,10 +100,8 @@ class Frame:
 
         def button2_click():
             if self.__select_file__():
-                text1.config(state=tkinter.NORMAL)
                 text1.delete("1.0", "end")
                 text1.insert("1.0", self.str_data)
-                text1.config(state=tkinter.DISABLED)
                 text2.delete("1.0", "end")
                 text2.insert("1.0", self.read_path)
 
@@ -125,7 +134,7 @@ class Frame:
                 else:
                     tempDna += line.strip()
                     dna[tempName] = tempDna
-        self.dna_dict = dna
+        self._dna_dict = dna
         with open(self.read_path, 'r') as fh:
             self.str_data = fh.read()
         pass
@@ -157,7 +166,6 @@ class Draw:
         canvas.draw()
         canvas.get_tk_widget().place(x=location["x"], y=location["y"])
         pass
-
 
 
 if __name__ == "__main__":
