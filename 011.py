@@ -203,7 +203,7 @@ class Frame:
         window.mainloop()
 
     @staticmethod
-    def _create_frame_(master, width, height, propagate=False, box=True):
+    def _create_frame_(master, width, height, propagate=False, box=False):
         frame = tkinter.Frame(master, width=width, height=height)
         frame.pack_propagate(propagate)
         if box:
