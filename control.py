@@ -1,7 +1,7 @@
 import tkinter
 from threading import Thread
 
-import w001
+import w001, w002, w003, w004, w005, w006, w007, w008, w009, w010, w011, w012, w013
 
 
 class Frame:
@@ -65,13 +65,11 @@ class ControlWindow(Frame):
         self._window.resizable(False, False)
         self._window.title(self._title)
 
-        self._create_thread(w001.CountDna)
-
         self._window.mainloop()
 
     @staticmethod
-    def _create_thread(myclass):
-        t = Thread(target=myclass(), name=myclass.__name__)
+    def _create_thread(target_class):
+        t = Thread(target=lambda: target_class(), name=target_class.__name__)
         t.start()
 
 
