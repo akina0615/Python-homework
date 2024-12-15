@@ -1,5 +1,6 @@
 import tkinter
 from threading import Thread
+from tkinter import scrolledtext
 
 import w001, w002, w003, w004, w005, w006, w007, w008, w009, w010, w011, w012, w013
 
@@ -92,12 +93,62 @@ class ControlWindow(Frame):
             ('排列组合', w012.Frame),
             ('随机DNA序列', w013.Frame)
         ]
+
         menu1 = super()._create_menu_(self._window, font=("Arial", 20), tearoff=False)
 
         for label, module in menu_list:
             menu1.add_command(label=label, command=lambda m=module: self._create_thread(m))
 
         self._window.config(menu=menu1, padx=10, pady=10)
+
+        label_author = self._create_label_(self._window, self._author, font=("Arial", 12))
+        label_author.pack(side='bottom')
+
+        read_me = scrolledtext.ScrolledText(self._window, width=400, height=400, font=('Arial', 16), wrap=tkinter.WORD)
+        read_me.pack(side='top', fill='both', expand=True)
+        initial_text = "感谢您使用本应用。请按需选择菜单上的对应功能！"
+        read_me.config(foreground='grey')
+        read_me.insert(tkinter.END, initial_text)
+
+        def read_me_key_Handler(event):
+            read_me.config(foreground='black')
+            read_me.delete('1.0', 'end')
+            read_me.unbind("<Key>")
+
+        read_me.bind("<Key>", read_me_key_Handler)
+
+        def on_copy(event=None):
+            try:
+                selected_text = read_me.get(tkinter.SEL_FIRST, tkinter.SEL_LAST)
+                self._window.clipboard_clear()
+                self._window.clipboard_append(selected_text)
+            except tkinter.TclError:
+                print("没有选中文本！")
+
+        def on_paste(event=None):
+            try:
+                clipboard_text = self._window.clipboard_get()
+                read_me.insert(tkinter.INSERT, clipboard_text)
+            except tkinter.TclError:
+                print("剪贴板没有文本内容！")
+
+        def on_delete(event=None):
+            try:
+                read_me.delete(tkinter.SEL_FIRST, tkinter.SEL_LAST)
+                print("删除选中文本")
+            except tkinter.TclError:
+                print("没有选中文本可以删除！")
+
+        context_menu = tkinter.Menu(self._window, tearoff=0)
+        context_menu.add_command(label="复制", command=on_copy)
+        context_menu.add_command(label="粘贴", command=on_paste)
+        context_menu.add_command(label="删除", command=on_delete)
+
+        def read_me_click_Handler(event):
+            context_menu.post(event.x_root, event.y_root)
+            pass
+
+        read_me.bind("<Button-3>", read_me_click_Handler)
 
 
 if __name__ == '__main__':
