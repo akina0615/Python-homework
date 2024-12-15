@@ -1,5 +1,6 @@
 import tkinter
 from tkinter import messagebox
+from tkinter import ttk
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -56,15 +57,16 @@ class Frame:
         window = tkinter.Tk()
         window.geometry(self.config["geometry"])
         window.title(self.config["title"])
-        label_author = self.__create_label__(window, text=self.config["author"],
-                                             width=40, height=3)
+
+        label_author = self.__create_label__(window, text=self.config["author"], width=40, height=3)
         label_author.pack(side="bottom")
-        label_n = self.__create_label__(window, text=self.config["label_n"],
-                                        width=20, height=2)
+
+        label_n = self.__create_label__(window, text=self.config["label_n"], width=20, height=2)
         label_n.place(x=65, y=50)
-        label_k = self.__create_label__(window, text=self.config["label_k"],
-                                        width=20, height=2)
+
+        label_k = self.__create_label__(window, text=self.config["label_k"], width=20, height=2)
         label_k.place(x=365, y=50)
+
         entry_n = self.__combo_box__(window, width=10, height=5, x=265, y=60, range_a=1, range_b=100)
         entry_k = self.__combo_box__(window, width=10, height=5, x=565, y=60, range_a=1, range_b=100)
 
@@ -81,7 +83,6 @@ class Frame:
             fib_index = d.create_index(fib_list)
             d.draw_chart(x_data=fib_list, x_index=fib_index, pic_size={"x": 7, "y": 4}, title="柱形示意图",
                          y_label="对数", x_label="代", location={"x": 50.0, "y": 180.0})
-            pass
 
         button_calculate = self.__create_button__(window, width=5, height=1, button_click=f)
         button_calculate.place(x=680, y=55)
@@ -90,14 +91,7 @@ class Frame:
         window.mainloop()
 
     def __create_label__(self, master, text, width, height):
-        return tkinter.Label(master, text=text, font=self.config["font"],
-                             width=width, height=height)
-
-    def __create_text__(self, master, width, height):
-        return tkinter.Text(master, font=self.config["font"], width=width, height=height)
-
-    def __create_entry__(self, master, width, var):
-        return tkinter.Entry(master, font=self.config["font"], width=width, textvariable=var)
+        return tkinter.Label(master, text=text, font=self.config["font"], width=width, height=height)
 
     def __create_button__(self, master, width, height, button_click):
         return tkinter.Button(master, text=self.config["button"], font=self.config["font"], width=width, height=height,
@@ -105,38 +99,27 @@ class Frame:
 
     def __combo_box__(self, master, width, height, x, y, range_a, range_b):
         var1 = tkinter.StringVar()
-        entry = self.__create_entry__(master, width=width, var=var1)
-        entry.place(x=x, y=y)
-        scroll = tkinter.Scrollbar(master, orient="vertical")
-        listbox = tkinter.Listbox(master, width=width, height=height)
-        listbox.config(yscrollcommand=scroll.set)
-        for i in range(range_a, range_b):
-            listbox.insert("end", str(i))
-        scroll.config(command=listbox.yview)
+        combobox = ttk.Combobox(master, width=width, textvariable=var1)
+        combobox.place(x=x, y=y)
+        combobox['values'] = [str(i) for i in range(range_a, range_b)]
 
-        def entry_n_bind(event):
-            listbox.place(x=x, y=y + 20)
-            scroll.place(x=x + 80, y=y + 30)
+        def on_select(event):
+            selected_value = combobox.get()
+            if selected_value:
+                var1.set(selected_value)
 
-        def listbox_curselection(event):
-            index = listbox.curselection()[0]
-            listbox.activate(index)
-            var1.set(listbox.get(index))
-            listbox.place_forget()
-            scroll.place_forget()
+        # 绑定选择事件
+        combobox.bind("<<ComboboxSelected>>", on_select)
 
-        entry.bind("<Button-1>", entry_n_bind)
-        listbox.bind("<ButtonRelease-1>", listbox_curselection)
-        return entry
+        return combobox
 
 
 class Draw:
     def __init__(self, master):
         self.__master = master
 
-    def draw_chart(self, x_data, x_index, pic_size: dict[float:float] = {"x": 7, "y": 3}, title="", x_label="x",
-                   y_label="y",
-                   location: dict[str:float] = {"x": 60.0, "y": 250.0}):
+    def draw_chart(self, x_data, x_index, pic_size: dict = {"x": 7, "y": 3}, title="", x_label="x",
+                   y_label="y", location: dict = {"x": 60.0, "y": 250.0}):
         plt.rcParams["font.sans-serif"] = ["SimHei"]
         plt.rcParams["axes.unicode_minus"] = False
         data = x_data
@@ -150,12 +133,10 @@ class Draw:
         ax.set_title(title)
         for bar, height in zip(bars, data):
             y_val = height
-            ax.text(bar.get_x() + bar.get_width() / 2 - 0.1, y_val,
-                    y_val, ha='center', va='bottom')
+            ax.text(bar.get_x() + bar.get_width() / 2 - 0.1, y_val, y_val, ha='center', va='bottom')
         canvas = FigureCanvasTkAgg(fig, master=self.__master)
         canvas.draw()
         canvas.get_tk_widget().place(x=location["x"], y=location["y"])
-        pass
 
     @staticmethod
     def create_index(data_list: list):
@@ -167,5 +148,3 @@ class Draw:
 
 if __name__ == '__main__':
     test = Frame()
-
-# 2024/11/18:author: @孙伟嘉 注:未来可以考虑增加一个输入起始兔子数量的功能
