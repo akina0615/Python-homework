@@ -143,6 +143,32 @@ class ControlWindow(Frame):
         context_menu.add_command(label="复制", command=on_copy)
         context_menu.add_command(label="粘贴", command=on_paste)
         context_menu.add_command(label="删除", command=on_delete)
+        color_menu = tkinter.Menu(context_menu, tearoff=0)
+        color_dict = {
+            '黑色': 'black',
+            '灰色': 'gray',
+            '红色': 'red',
+            '蓝色': 'blue',
+            '绿色': 'green',
+            '黄色': 'yellow',
+            '粉色': 'pink',
+            '橙色': 'orange'
+        }
+
+        def color_fun(color):
+            selected_text = read_me.tag_ranges("sel")
+            if selected_text:
+                tag_name = f"color_tag_{selected_text[0]}_{selected_text[1]}"
+                read_me.tag_add(tag_name, selected_text[0], selected_text[1])
+                read_me.tag_configure(tag_name, foreground=color)
+
+        for color in color_dict:
+            color_menu.add_command(
+                label=f'{color}',
+                command=lambda color=color: color_fun(color_dict[color])
+            )
+
+        context_menu.add_cascade(label='颜色', menu=color_menu)
 
         def read_me_click_Handler(event):
             context_menu.post(event.x_root, event.y_root)
